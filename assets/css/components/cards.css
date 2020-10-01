@@ -1,10 +1,3 @@
-@import "https://bqardi.github.io/cards/api/card.css";
-
-.card {
-    padding: 0.75em 0.5em;
-    background-color: hsl(0, 0%, 100%);
-}
-
 .card.js-abovecard {
     position: absolute;
     top: 0;
@@ -22,13 +15,64 @@
 .cards {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 1.5em 0.5em;
+    gap: 1em 0.5em;
 }
 
 .cards__empty {
     position: relative;
-    border: 1px solid hsl(0, 0%, 88%);
+    border: 1px solid hsl(120, 100%, 22%);
     border-radius: 1em;
-    background-color: hsl(0, 0%, 96%);
-    min-height: 17.6vw;
+    box-shadow: 0 0 20px hsla(0, 0%, 0%, 0.1) inset;
+}
+
+.card {
+    cursor: pointer;
+    transform: scale(1.01);
+    transition: all 150ms ease-out;
+}
+
+.card:hover{
+    transform: scale(1.03);
+    transition: all 300ms ease-out;
+}
+
+.card:hover .card__container{
+    box-shadow: 5px 5px 12px 0 rgba(0, 0, 0, 0.25);
+    transition: all 300ms ease-out;
+}
+
+.card__container{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid black;
+    border-radius: 15px;
+    box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, 0.2);
+    transform-style: preserve-3d;
+    background-color: hsl(0, 0%, 100%);
+}
+
+.card__image,
+.card__imageBack{
+    display: block;
+    margin: 0.5em;
+    backface-visibility: hidden;
+}
+
+.card__image{
+    width: calc(100% - 1em);
+    transform: rotateY(180deg);
+}
+
+.card__imageBack{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.card.js-revealed .card__container {
+    transform: rotateY(180deg);
 }
