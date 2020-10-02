@@ -1,4 +1,5 @@
 import getCards from "https://bqardi.github.io/cards/api/card.js";
+import splashScreen from "./modules/splash-screen.js";
 
 let cardsShuffleContainer = document.querySelector(".cards__shuffled");
 let cardsShuffled = cardsShuffleContainer.querySelector(".cards__container");
@@ -19,13 +20,16 @@ document.querySelectorAll(".cards__field").forEach(element => {
 
 cardsShuffleContainer.addEventListener("click", function(event){
     if (event.target.classList.contains("cards__empty")) {
+        flippedCards = [];
         deckFlipCount++;
         deckFlipCounter.textContent = deckFlipCount;
         cardsObj.inPlayToDeck();
         placeDeck(cardsObj);
         cardsRevealed.innerHTML = "";
     }
-})
+});
+
+splashScreen();
 
 getCards(function(cards){
     cardsShuffled.innerHTML = "";
@@ -43,15 +47,14 @@ function placeDeck(cards){
     
     deck.addEventListener("click", function(){
         let cardFlipCount = Math.min(3, cards.deck.length);
-        flippedCards = [];
         for (let i = 0; i < cardFlipCount; i++) {
             let card = drawCard(true).card;
             flippedCards.push(card);
             card.style.left = `${i * CARD_OFFSET}vw`;
             card.style.right = `${i * -CARD_OFFSET}vw`;
-            card.dataset.sealed = i === cardFlipCount - 1 ? "false" : "true";
             cardsRevealed.appendChild(card);
         }
+        updateFlippedCards();
         if (cards.deck.length === 0) {
             cardsShuffled.innerHTML = "";
         }
@@ -61,11 +64,17 @@ function placeDeck(cards){
 }
 
 function updateFlippedCards(){
-    if (flippedCards.length <= 1) {
+    if (flippedCards.length === 0) {
         return;
     }
-    flippedCards.splice(flippedCards.length - 1);
-    flippedCards.slice(-1)[0].dataset.sealed = "false";
+    for (let i = 0; i < flippedCards.length; i++) {
+        const flippedCard = flippedCards[i];
+        if (i === flippedCards.length - 1) {
+            flippedCard.dataset.sealed = "false";
+        } else {
+            flippedCard.dataset.sealed = "true";
+        }
+    }
 }
 
 function deal(){
@@ -76,6 +85,9 @@ function deal(){
             let card = drawCard(false).card;
             placeCard(field, card, true);
             card.addEventListener("click", function(){
+                if (card.dataset.locked === "true") {
+                    return;
+                }
                 revealCard(card);
             });
         }
@@ -255,6 +267,7 @@ function placeCard(field, card, dealing = false){
         cardsObj.discard(foundCardObj.drawn);
         revealed.splice(index, 1);
         arrayOfCards.push(card);
+        flippedCards.splice(-1);
         updateFlippedCards();
     }
     arrayOfCards.forEach(movedCard => {

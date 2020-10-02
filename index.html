@@ -10,8 +10,85 @@
     <link rel="stylesheet" href="./assets/css/base.css">
 </head>
 <body>
-    <h1>Card API fetch example - Klondike Solitaire</h1>
+    <section class="overlay">
+        <div class="overlay__window">
+            <div class="suits">
+                <div class="suit">
+                    <div class="heart">
+                        <div class="suit__elm heart__left suit__red"></div>
+                        <div class="suit__elm heart__right suit__red"></div>
+                    </div>
+                </div>
+                <div class="suit">
+                    <div class="spade">
+                        <div class="suit__elm heart__left suit__black"></div>
+                        <div class="suit__elm heart__right suit__black"></div>
+                    </div>
+                    <div class="suit__foot">
+                        <div class="suit__elm"></div>
+                    </div>
+                </div>
+                <div class="suit">
+                    <div class="diamond">
+                        <div class="suit__elm suit__red"></div>
+                    </div>
+                </div>
+                <div class="suit">
+                    <div class="club">
+                        <div class="suit__elm circle__left suit__black"></div>
+                        <div class="suit__elm circle__top suit__black"></div>
+                        <div class="suit__elm circle__center suit__black"></div>
+                        <div class="suit__elm circle__right suit__black"></div>
+                    </div>
+                    <div class="suit__foot">
+                        <div class="suit__elm"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="cssCard">
+                <div class="cssCard__card">
+                    <h2 class="cssCard__title">Klondike Solitaire</h2>
+                    <div class="topLeft">
+                        <h3>A</h3>
+                        <div class="suit">
+                            <div class="spade">
+                                <div class="suit__elm heart__left suit__black"></div>
+                                <div class="suit__elm heart__right suit__black"></div>
+                            </div>
+                            <div class="suit__foot">
+                                <div class="suit__elm"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="center">
+                        <div class="suit">
+                            <div class="spade">
+                                <div class="suit__elm heart__left suit__black"></div>
+                                <div class="suit__elm heart__right suit__black"></div>
+                            </div>
+                            <div class="suit__foot">
+                                <div class="suit__elm"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottomRight">
+                        <h3>A</h3>
+                        <div class="suit">
+                            <div class="spade">
+                                <div class="suit__elm heart__left suit__black"></div>
+                                <div class="suit__elm heart__right suit__black"></div>
+                            </div>
+                            <div class="suit__foot">
+                                <div class="suit__elm"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     <section class="board">
+        <h1>Card API fetch example - Klondike Solitaire</h1>
         <section class="cards">
             <article class="cards__shuffled cards__empty">
                 <div class="cards__counter">1</div>

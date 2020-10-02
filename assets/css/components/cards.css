@@ -17,6 +17,7 @@
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 1em 0.5em;
+    margin-top: 3em;
 }
 
 .cards__empty {
