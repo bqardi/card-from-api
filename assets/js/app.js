@@ -1,18 +1,26 @@
 import getCards from "https://bqardi.github.io/cards/api/card.js";
 
-let cardsShuffled = document.querySelector(".cards__shuffled");
+let cardsShuffleContainer = document.querySelector(".cards__shuffled");
+let cardsShuffled = cardsShuffleContainer.querySelector(".cards__container");
+let deckFlipCounter = document.querySelector(".cards__counter");
 let cardsRevealed = document.querySelector(".cards__turned");
+
+const CARD_OFFSET = 2;
 
 let fields = [];
 let revealed = [];
+let flippedCards = [];
 let cardsObj;
+let deckFlipCount = 1;
 
 document.querySelectorAll(".cards__field").forEach(element => {
     fields.push(createField(element));
 });
 
-cardsShuffled.addEventListener("click", function(event){
+cardsShuffleContainer.addEventListener("click", function(event){
     if (event.target.classList.contains("cards__empty")) {
+        deckFlipCount++;
+        deckFlipCounter.textContent = deckFlipCount;
         cardsObj.inPlayToDeck();
         placeDeck(cardsObj);
         cardsRevealed.innerHTML = "";
@@ -34,14 +42,30 @@ function placeDeck(cards){
     cardsShuffled.appendChild(deck);
     
     deck.addEventListener("click", function(){
-        let card = drawCard(true).card;
-        revealCard(card);
-        cardsRevealed.appendChild(card);
+        let cardFlipCount = Math.min(3, cards.deck.length);
+        flippedCards = [];
+        for (let i = 0; i < cardFlipCount; i++) {
+            let card = drawCard(true).card;
+            flippedCards.push(card);
+            card.style.left = `${i * CARD_OFFSET}vw`;
+            card.style.right = `${i * -CARD_OFFSET}vw`;
+            card.dataset.sealed = i === cardFlipCount - 1 ? "false" : "true";
+            cardsRevealed.appendChild(card);
+        }
         if (cards.deck.length === 0) {
             cardsShuffled.innerHTML = "";
         }
     });
+
     return deck;
+}
+
+function updateFlippedCards(){
+    if (flippedCards.length <= 1) {
+        return;
+    }
+    flippedCards.splice(flippedCards.length - 1);
+    flippedCards.slice(-1)[0].dataset.sealed = "false";
 }
 
 function deal(){
@@ -50,14 +74,14 @@ function deal(){
     columns.forEach(field => {
         for (let i = 0; i < facedDown; i++) {
             let card = drawCard(false).card;
-            placeCard(field, card);
+            placeCard(field, card, true);
             card.addEventListener("click", function(){
                 revealCard(card);
             });
         }
         facedDown++;
         let card = drawCard(true).card;
-        placeCard(field, card);
+        placeCard(field, card, true);
         revealCard(card);
     });
 }
@@ -149,7 +173,7 @@ function createField(element){
             } else {
                 card.classList.add("js-abovecard");
                 if (this.element.classList.contains("cards__table")) {
-                    card.style.top = `${this.cards.length * 3 - 3}vw`;
+                    card.style.top = `${this.cards.length * CARD_OFFSET - CARD_OFFSET}vw`;
                 }
             }
             this.element.appendChild(card);
@@ -177,6 +201,9 @@ function createField(element){
 }
 
 function drag(event){
+    if (event.currentTarget.dataset.sealed === "true") {
+        return;
+    }
     event.dataTransfer.setData("text", event.currentTarget.id);
 }
 
@@ -188,27 +215,33 @@ function drop(event){
     placeCard(field, card);
 }
 
-function placeCard(field, card){
+function placeCard(field, card, dealing = false){
     if (!card) {
         return;
     }
-    let lastCard = field.lastCard();
+    let lastCardInField = field.lastCard();
     let currentCardObj = cardsObj.findCard(card.id);
     let arrayOfCards = [];
-    if (lastCard && lastCard.classList.contains("js-revealed")) {
-        let cardInFieldObj = cardsObj.findCard(lastCard.id);
-        if (field.isAces) {
-            if (currentCardObj.suit !== cardInFieldObj.suit || currentCardObj.value !== cardInFieldObj.value + 1) {
-                return;
-            }
-        } else {
-            if (currentCardObj.color === cardInFieldObj.color || currentCardObj.value !== cardInFieldObj.value - 1) {
-                return;
+    if (lastCardInField) {
+        if (lastCardInField.classList.contains("js-revealed")) {
+            let cardInFieldObj = cardsObj.findCard(lastCardInField.id);
+            if (field.isAces) {
+                if (currentCardObj.suit !== cardInFieldObj.suit || currentCardObj.value !== cardInFieldObj.value + 1) {
+                    return;
+                }
+            } else {
+                if (currentCardObj.color === cardInFieldObj.color || currentCardObj.value !== cardInFieldObj.value - 1) {
+                    return;
+                }
             }
         }
     } else {
         if (field.isAces) {
             if (currentCardObj.value !== 1) {
+                return;
+            }
+        } else {
+            if (!dealing && currentCardObj.value !== 13) {
                 return;
             }
         }
@@ -222,6 +255,7 @@ function placeCard(field, card){
         cardsObj.discard(foundCardObj.drawn);
         revealed.splice(index, 1);
         arrayOfCards.push(card);
+        updateFlippedCards();
     }
     arrayOfCards.forEach(movedCard => {
         movedCard.setAttribute("data-field", field.id);
