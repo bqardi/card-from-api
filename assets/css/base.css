@@ -1,11 +1,14 @@
 @import "./components/board.css";
 @import "./components/cards.css";
+@import "./components/overlay.css";
+@import "./components/css-card.css";
 
 body {
     font-family: "Roboto", sans-serif;
     background-color: green;
     color: white;
     font-weight: 300;
+    margin: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
