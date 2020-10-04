@@ -1,25 +1,30 @@
 import getCards from "https://bqardi.github.io/cards/api/card.js";
-import splashScreen from "./modules/splash-screen.js";
+import {splashScreen, closeSplashScreen} from "./modules/splash-screen.js";
+import {onRestart, onRevealCount as onDrawButton} from "./modules/settings.js";
 
 let cardsShuffleContainer = document.querySelector(".cards__shuffled");
 let cardsShuffled = cardsShuffleContainer.querySelector(".cards__container");
 let deckFlipCounter = document.querySelector(".cards__counter");
 let cardsRevealed = document.querySelector(".cards__turned");
 
-const CARD_OFFSET = 2;
+const SPLASH_SCREEN_TIMEOUT = 3000;
+const CARD_OFFSET = 14;
+const EMPTY_SVG = `<svg class="deck__end" viewBox="0 0 215 284.5"></svg>`;
 
 let fields = [];
 let revealed = [];
 let flippedCards = [];
 let cardsObj;
 let deckFlipCount = 1;
+let revealCount = 3;
 
 document.querySelectorAll(".cards__field").forEach(element => {
     fields.push(createField(element));
 });
 
 cardsShuffleContainer.addEventListener("click", function(event){
-    if (event.target.classList.contains("cards__empty")) {
+    if (event.target.classList.contains("deck__end")) {
+        cardsShuffled.innerHTML = "";
         flippedCards = [];
         deckFlipCount++;
         deckFlipCounter.textContent = deckFlipCount;
@@ -29,34 +34,51 @@ cardsShuffleContainer.addEventListener("click", function(event){
     }
 });
 
-splashScreen();
-
-getCards(function(cards){
-    cardsShuffled.innerHTML = "";
-    cardsRevealed.innerHTML = "";
-    cards.shuffleDeck();
-    cardsObj = cards;
-    placeDeck(cards);
-    deal();
+splashScreen(SPLASH_SCREEN_TIMEOUT);
+onRestart(restart);
+let firstFlip = onDrawButton(function(count){
+    revealCount = count;
 });
 
+getCards(function(cards){
+    cardsObj = cards;
+    restart();
+}, true);
+
+function restart(){
+    cardsShuffled.innerHTML = "";
+    cardsRevealed.innerHTML = "";
+    fields.forEach(field => {
+        field.reset();
+    });
+    flippedCards = [];
+    deckFlipCount = 0;
+    deckFlipCounter.textContent = deckFlipCount;
+    firstFlip.state = true;
+    cardsObj.reset();
+    cardsObj.shuffleDeck();
+    placeDeck(cardsObj);
+    deal();
+}
+
 function placeDeck(cards){
-    let deck = createCard(cards.back.blue.image);
+    let deck = createCard();
     
     cardsShuffled.appendChild(deck);
     
     deck.addEventListener("click", function(){
-        let cardFlipCount = Math.min(3, cards.deck.length);
+        firstFlip.state = false;
+        let cardFlipCount = Math.min(revealCount, cards.deck.length);
         for (let i = 0; i < cardFlipCount; i++) {
             let card = drawCard(true).card;
             flippedCards.push(card);
-            card.style.left = `${i * CARD_OFFSET}vw`;
-            card.style.right = `${i * -CARD_OFFSET}vw`;
+            card.style.left = `${i * CARD_OFFSET}%`;
+            card.style.right = `${i * -CARD_OFFSET}%`;
             cardsRevealed.appendChild(card);
         }
         updateFlippedCards();
         if (cards.deck.length === 0) {
-            cardsShuffled.innerHTML = "";
+            cardsShuffled.innerHTML = EMPTY_SVG;
         }
     });
 
@@ -106,6 +128,7 @@ function revealCard(card){
 }
 
 function toAcePlace(event){
+    firstFlip.state = false;
     let card = event.currentTarget;
     if (card.dataset.locked === "true") {
         return;
@@ -132,7 +155,7 @@ function toAcePlace(event){
 
 function drawCard(faceUp){
     let drawn = cardsObj.draw();
-    let card = createCard(drawn.image);
+    let card = createCard(drawn.id);
     if (faceUp) {
         revealCard(card);
     }
@@ -141,7 +164,7 @@ function drawCard(faceUp){
     return {drawn, card};
 }
 
-function createCard(imgSrc){
+function createCard(id){
     let card = document.createElement("DIV");
     card.classList.add("card");
     card.dataset.locked = false;
@@ -149,8 +172,14 @@ function createCard(imgSrc){
     let cardContainer = document.createElement("DIV");
     cardContainer.classList.add("card__container");
     
-    let img = document.createElement("IMG");
-    img.src = imgSrc;
+    if (id) {
+        // let img = document.createElement("IMG");
+        // img.src = imgSrc;
+        var img = cardsObj.getImage(id);
+    } else {
+        var img = document.createElement("DIV");
+        img.innerHTML = EMPTY_SVG;
+    }
     img.classList.add("card__image");
     cardContainer.appendChild(img);
 
@@ -175,6 +204,7 @@ function createField(element){
         cards: [],
         isEmpty: true,
         isAces: element.classList.contains("cards__ace"),
+        isComplete: false,
         addCard(card){
             this.cards.push(card);
             this.updateLocked();
@@ -185,7 +215,7 @@ function createField(element){
             } else {
                 card.classList.add("js-abovecard");
                 if (this.element.classList.contains("cards__table")) {
-                    card.style.top = `${this.cards.length * CARD_OFFSET - CARD_OFFSET}vw`;
+                    card.style.top = `${this.cards.length * CARD_OFFSET - CARD_OFFSET}%`;
                 }
             }
             this.element.appendChild(card);
@@ -208,6 +238,15 @@ function createField(element){
         },
         lockCard(card, index, array){
             card.dataset.locked = index !== array.length - 1;
+        },
+        reset(){
+            this.cards = [];
+            this.isEmpty = true;
+            this.isComplete = false;
+            for (let i = this.element.children.length - 1; i >= 0; i--) {
+                const child = this.element.children[i];
+                child.remove();
+            }
         }
     }
 }
@@ -221,6 +260,7 @@ function drag(event){
 
 function drop(event){
     event.preventDefault();
+    firstFlip.state = false;
     let field = fields.find(obj => obj.id === event.currentTarget.id);
     let data = event.dataTransfer.getData("text");
     let card = document.getElementById(data);
@@ -241,6 +281,16 @@ function placeCard(field, card, dealing = false){
                 if (currentCardObj.suit !== cardInFieldObj.suit || currentCardObj.value !== cardInFieldObj.value + 1) {
                     return;
                 }
+                if (currentCardObj.value === 13) {
+                    field.isComplete = true;
+                    if (winCondition()) {
+                        document.querySelector(".win").classList.add("js-show")
+                        setTimeout(() => {
+                            document.querySelector(".win").classList.remove("js-show")
+                            restart();
+                        }, 3000);
+                    }
+                }
             } else {
                 if (currentCardObj.color === cardInFieldObj.color || currentCardObj.value !== cardInFieldObj.value - 1) {
                     return;
@@ -253,14 +303,22 @@ function placeCard(field, card, dealing = false){
                 return;
             }
         } else {
-            if (!dealing && currentCardObj.value !== 13) {
-                return;
+            if (!dealing) {
+                if (currentCardObj.value !== 13) {
+                    return;
+                } else {
+                    field.element.innerHTML = "";
+                }
             }
         }
     }
     if (card.dataset.field) {
         let prevField = fields.find(obj => obj.id === card.dataset.field);
         arrayOfCards = prevField.removeFrom(card);
+        if (!prevField.lastCard()) {
+            prevField.element.innerHTML = EMPTY_SVG;
+        }
+        prevField.isComplete = false;
     } else {
         let foundCardObj = findCardInPlay(card.id);
         let index = revealed.indexOf(foundCardObj);
@@ -278,4 +336,14 @@ function placeCard(field, card, dealing = false){
 
 function findCardInPlay(id){
     return revealed.find(obj => obj.card.id === id);
+}
+
+function winCondition(){
+    let win = true;
+    fields.forEach(field => {
+        if (field.isAces && !field.isComplete) {
+            win = false;
+        }
+    });
+    return win;
 }

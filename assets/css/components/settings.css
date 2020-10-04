@@ -1,0 +1,87 @@
+.settings{
+    display: flex;
+}
+
+.settings__button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    background-color: hsl(0, 0%, 80%);
+    padding: 0.5em 1em;
+    margin-left: 0.25em;
+    border: 1px solid black;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: 150ms;
+}
+
+.settings__button:hover{
+    background-color: hsl(0, 0%, 95%);
+}
+
+.settings__button:hover .settings__icon{
+    fill: green;
+}
+
+.settings__icon{
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    transition: fill 150ms;
+}
+
+/* TOGGLE BUTTON */
+.settings__toggle{
+    position: relative;
+    justify-content: space-between;
+    padding: 0.5em;
+    overflow: hidden;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5) inset;
+}
+
+.settings__slider{
+    position: absolute;
+    left: 0;
+    right: 40%;
+    background-color: hsl(108, 52%, 68%);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 3px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    transition: 150ms;
+}
+
+.settings__slider.js-one{
+    left: 40%;
+    right: 0;
+}
+
+.settings__toggle:hover .settings__slider{
+    background-color: hsl(108, 52%, 88%);
+}
+
+.settings__toggle.js-deactivated{
+    color: hsl(0, 0%, 65%);
+    background-color: hsl(0, 0%, 80%);
+    border: 1px solid hsl(0, 0%, 35%);
+}
+
+.settings__toggle.js-deactivated .settings__slider{
+    background-color: hsl(0, 0%, 80%);
+    border: 1px solid hsl(0, 0%, 80%);
+}
+
+.settings__value{
+    width: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings__value:last-of-type{
+    margin-left: 30px;
+}

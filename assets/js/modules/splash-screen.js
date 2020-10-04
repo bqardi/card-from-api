@@ -1,6 +1,9 @@
-function splashScreen(){
-    setTimeout(() => {
-        document.querySelector(".overlay").style.display = "none";
-    }, 3000);
+let splashTimeout;
+function splashScreen(timeout){
+    splashTimeout = setTimeout(closeSplashScreen, timeout);
 }
-export default splashScreen;
+function closeSplashScreen(){
+    clearTimeout(splashTimeout);
+    document.querySelector(".overlay").style.display = "none";
+}
+export {splashScreen, closeSplashScreen};
