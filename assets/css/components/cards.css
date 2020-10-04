@@ -58,12 +58,12 @@
 .card__image,
 .card__imageBack{
     display: block;
+    width: calc(100% - 1em);
     margin: 0.5em;
     backface-visibility: hidden;
 }
 
 .card__image{
-    width: calc(100% - 1em);
     transform: rotateY(180deg);
 }
 

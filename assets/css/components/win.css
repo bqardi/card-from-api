@@ -1,0 +1,32 @@
+.win{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0);
+    transition: 300ms;
+}
+
+.win.js-show{
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.win__window{
+    padding: 1em;
+}
+
+.win__text{
+    font-size: 16vw;
+    font-weight: 700;
+    color: gold;
+    text-shadow: 5px 5px 15px black;
+}

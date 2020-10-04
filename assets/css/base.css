@@ -2,6 +2,8 @@
 @import "./components/cards.css";
 @import "./components/overlay.css";
 @import "./components/css-card.css";
+@import "./components/win.css";
+@import "./components/settings.css";
 
 body {
     font-family: "Roboto", sans-serif;
@@ -13,4 +15,11 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 100;
+}
+
+.mainHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5em;
 }

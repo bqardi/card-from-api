@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A Klondike Solitaire example using my Card API">
     <title>Card API fetch example</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:wght@100;300;700&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="./assets/images/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="./assets/css/base.css">
 </head>
 <body>
+    <section class="win">
+        <div class="win__window">
+            <p class="win__text">YOU WIN!</p>
+        </div>
+    </section>
     <section class="overlay">
         <div class="overlay__window">
             <div class="suits">
@@ -88,7 +93,22 @@
         </div>
     </section>
     <section class="board">
-        <h1>Card API fetch example - Klondike Solitaire</h1>
+        <header class="mainHeader">
+            <h1>Card API fetch example - Klondike Solitaire</h1>
+            <section class="settings">
+                <a href="#" class="settings__button settings__toggle settings__revealCount">
+                    <span class="settings__slider">Draw</span>
+                    <span class="settings__value">1</span>
+                    <span class="settings__value">3</span>
+                </a>
+                <a href="#" class="settings__button settings__restart">
+                    <svg class="settings__icon" viewBox="0 0 24 24"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"></path></svg>
+                    <span class="settings__text">
+                        Restart
+                    </span>
+                </a>
+            </section>
+        </header>
         <section class="cards">
             <article class="cards__shuffled cards__empty">
                 <div class="cards__counter">1</div>
